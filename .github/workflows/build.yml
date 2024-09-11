@@ -1,0 +1,17 @@
+name: build
+on: workflow_dispatch
+permissions:
+  pages: write
+  id-token: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build . -t br
+      - run: mkdir _site
+      - run: docker run --rm br cat /buildroot/output/images/Image.gz > _site/Image.gz
+      - run: docker run --rm br cat /buildroot/output/images/rootfs.cpio.xz > _site/rootfs.cpio.xz
+      - run: cd _site && tree -H '.' -s -D -o index.html
+      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/deploy-pages@v4
